@@ -4,10 +4,23 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
+import gdown
+import os
 
-# Load your trained model (replace with your actual model path)
-MODEL_PATH = 'model.h5'
-model = load_model(MODEL_PATH)
+# Define the Google Drive file ID for your model
+MODEL_URL = "https://drive.google.com/file/d/1dDIXndiz8PA1nYMqqUguMfEVnr2kZXcl/view?usp=sharing"
+
+# Load the model dynamically
+def load_model_from_drive():
+    model_path = 'model.h5'
+    if not os.path.exists(model_path):
+        # Download the model if it doesn't exist
+        with st.spinner("Downloading model... this may take a while! ⏳"):
+            gdown.download(MODEL_URL, model_path, quiet=False)
+    return tf.keras.models.load_model(model_path)
+
+# Load the model
+model = load_model_from_drive()
 
 # Define class names based on your model training
 class_names = ['Bacterial leaf blight', 'Brown spot', 'Leaf smut', 'Planthopper', 'Rice hispa', 'Steam borer whiteheads']
@@ -25,21 +38,17 @@ st.write("Upload an image of a rice plant, and this tool will classify whether i
 
 # Image uploader
 uploaded_file = st.file_uploader("Please Choose an image...", type=["jpg", "jpeg", "png"])
-
 if uploaded_file is not None:
     # Open and display the uploaded image
     img = Image.open(uploaded_file)
     st.image(img, caption="Uploaded Image", use_column_width=True)
-
     # Add the "Predict" button
     if st.button('Predict'):
         st.write("Classifying...")
-
         # Preprocess the image and make a prediction
         img_array = load_and_prep_image(img)
         predictions = model.predict(img_array)
         predicted_class_index = np.argmax(predictions)
         predicted_class = class_names[predicted_class_index]
-
         # Display the result
         st.write(f"Predicted class: **{predicted_class}**")
