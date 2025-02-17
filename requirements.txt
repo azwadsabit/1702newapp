@@ -1,5 +1,5 @@
-streamlit== 2.17.0  # Replace with the version you are using
+streamlit== 1.38.0  # Replace with the version you are using
 Pillow
 numpy
-tensorflow==2.13.0
+tensorflow==2.17.0
 gdown
